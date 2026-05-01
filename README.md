@@ -1,11 +1,3 @@
-# bgp_simulator
-BGP Simulator – CSE3150 Course Project
-The reason your README is "pasting weird" is that GitHub (and most Markdown-based platforms) doesn't automatically recognize visual spacing or indentation created with spaces and dashes. It also lacks the specific syntax needed to render code blocks, lists, and file trees correctly.
-
-Here is a professionally formatted version of your content. You can copy and paste the raw text below directly into your `README.md` file.
-
----
-
 # BGP Simulator – CSE3150 Course Project
 
 ## Overview
