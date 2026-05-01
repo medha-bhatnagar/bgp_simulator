@@ -101,44 +101,44 @@ Priority order for route selection:
 3. **Lowest next-hop ASN**
 
 5. AS-Path Construction
+Each AS:
 
-To maintain a valid record of the route's journey, the simulator handles path updates at each hop:
+Prepends its ASN when storing a route
 
-Prepending: When an AS accepts a route into its local_rib, it prepends its own ASN to the AS-path.
+Updates next-hop on send
 
-Next-Hop Tracking: Updates the next-hop ASN during the send phase so the recipient can identify the immediate source.
-
-Loop Prevention: The simulator checks if an AS's own ASN is already present in the path; if a loop is detected, the announcement is rejected.
+Rejects routes if its own ASN is already in the path (loop prevention)
 
 6. ROV Filtering
+If:
 
-The simulator models Route Origin Validation to simulate RPKI security:
+AS is ROV-enabled
 
-Enforcement: If an AS is listed in the rov_file, it acts as an "ROV-enabled" node.
-
-Drop Logic: Any announcement marked as invalid in the input CSV is dropped immediately by ROV-enabled nodes.
-
-Impact: This prevents hijacked or incorrect prefixes from propagating further down the chain from that node.
+Announcement is marked invalid
+It is dropped immediately and not stored in the RIB.
 
 7. Valley-Free Routing Enforcement
+Propagation strictly follows:
 
-To model real-world economic incentives, the simulator strictly enforces the Gao-Rexford model:
+Up (Customer → Provider)
 
-Valid Paths: Routes can flow from Customer → Provider, Peer ↔ Peer, or Provider → Customer.
+Peer (Single hop only)
 
-The "Valley" Constraint: A route received from a provider or a peer cannot be exported to another provider or peer.
+Down (Provider → Customer)
+Prevents:
 
-Result: This ensures that no AS provides free transit for its providers or peers, preventing "valleys" in the routing graph.
+Cycles
+
+Invalid routing paths (e.g., providing transit for a provider)
 
 8. Performance Considerations
+Used:
 
-Given the potential size of the CAIDA dataset (~100k+ nodes), the following optimizations were implemented:
+unordered_map > O(1) lookup
 
-std::unordered_map: Used for O(1) lookups of AS nodes by their ASN.
+Rank-based iteration > avoids repeated traversals
 
-Rank-Based Iteration: Instead of a full graph traversal for every announcement, the rank system allows the simulator to process the graph in a single linear pass per direction (Up, Across, Down).
-
-Memory Management: Adjacency lists were used instead of matrices to keep the memory footprint low for sparse Internet graphs.
+Batched processing > improves cache efficiency for large CAIDA datasets
 
 
 ---
