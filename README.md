@@ -103,19 +103,20 @@ Priority order for route selection:
 5. AS-Path Construction
 Each AS:
 
-Prepends its ASN when storing a route
+Prepends its ASN when storing a route.
 
-Updates next-hop on send
+Updates next-hop on send.
 
-Rejects routes if its own ASN is already in the path (loop prevention)
+Rejects routes if its own ASN is already in the path (loop prevention).
 
 6. ROV Filtering
 If:
 
-AS is ROV-enabled
+AS is ROV-enabled.
 
-Announcement is marked invalid
-It is dropped immediately and not stored in the RIB.
+Announcement is marked invalid.
+
+Result: It is dropped immediately and not stored in the RIB.
 
 7. Valley-Free Routing Enforcement
 Propagation strictly follows:
@@ -127,18 +128,18 @@ Peer (Single hop only)
 Down (Provider → Customer)
 Prevents:
 
-Cycles
+Cycles.
 
-Invalid routing paths (e.g., providing transit for a provider)
+Invalid routing paths (e.g., providing transit for a provider).
 
 8. Performance Considerations
 Used:
 
-unordered_map > O(1) lookup
+unordered_map → O(1) lookup.
 
-Rank-based iteration > avoids repeated traversals
+Rank-based iteration → avoids repeated traversals.
 
-Batched processing > improves cache efficiency for large CAIDA datasets
+Batched processing → improves cache efficiency for large CAIDA datasets.
 
 
 ---
