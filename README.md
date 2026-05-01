@@ -100,6 +100,32 @@ Priority order for route selection:
 2. **Shortest AS-path**
 3. **Lowest next-hop ASN**
 
+### 5. AS-Path Construction
+Each AS:
+**Prepends its ASN when storing a route***
+***Updates next-hop on send***
+
+### 6. ROV Filtering
+if:
+###AS is ROV-enabled###
+###announcement is invalid###
+it is dropped immediately
+
+###7. Valley-Free Routing Enforcement
+Propagation strictly follows:
+###Up###
+###Peer(single hop only)###
+###Down###
+Prevents:
+###cycles###
+###invalid routing paths###
+
+###Performance 
+###unordered_map>O(1) lookup###
+###rank-based iteration > avoide repeated traversals###
+###batched processing > improves cache efficiency###
+
+
 ---
 
 ## Testing
