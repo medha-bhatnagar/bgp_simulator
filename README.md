@@ -100,30 +100,45 @@ Priority order for route selection:
 2. **Shortest AS-path**
 3. **Lowest next-hop ASN**
 
-### 5. AS-Path Construction
-Each AS:
-**Prepends its ASN when storing a route***
-***Updates next-hop on send***
+5. AS-Path Construction
 
-### 6. ROV Filtering
-if:
-###AS is ROV-enabled###
-###announcement is invalid###
-it is dropped immediately
+To maintain a valid record of the route's journey, the simulator handles path updates at each hop:
 
-###7. Valley-Free Routing Enforcement
-Propagation strictly follows:
-###Up###
-###Peer(single hop only)###
-###Down###
-Prevents:
-###cycles###
-###invalid routing paths###
+Prepending: When an AS accepts a route into its local_rib, it prepends its own ASN to the AS-path.
 
-###Performance 
-###unordered_map>O(1) lookup###
-###rank-based iteration > avoide repeated traversals###
-###batched processing > improves cache efficiency###
+Next-Hop Tracking: Updates the next-hop ASN during the send phase so the recipient can identify the immediate source.
+
+Loop Prevention: The simulator checks if an AS's own ASN is already present in the path; if a loop is detected, the announcement is rejected.
+
+6. ROV Filtering
+
+The simulator models Route Origin Validation to simulate RPKI security:
+
+Enforcement: If an AS is listed in the rov_file, it acts as an "ROV-enabled" node.
+
+Drop Logic: Any announcement marked as invalid in the input CSV is dropped immediately by ROV-enabled nodes.
+
+Impact: This prevents hijacked or incorrect prefixes from propagating further down the chain from that node.
+
+7. Valley-Free Routing Enforcement
+
+To model real-world economic incentives, the simulator strictly enforces the Gao-Rexford model:
+
+Valid Paths: Routes can flow from Customer → Provider, Peer ↔ Peer, or Provider → Customer.
+
+The "Valley" Constraint: A route received from a provider or a peer cannot be exported to another provider or peer.
+
+Result: This ensures that no AS provides free transit for its providers or peers, preventing "valleys" in the routing graph.
+
+8. Performance Considerations
+
+Given the potential size of the CAIDA dataset (~100k+ nodes), the following optimizations were implemented:
+
+std::unordered_map: Used for O(1) lookups of AS nodes by their ASN.
+
+Rank-Based Iteration: Instead of a full graph traversal for every announcement, the rank system allows the simulator to process the graph in a single linear pass per direction (Up, Across, Down).
+
+Memory Management: Adjacency lists were used instead of matrices to keep the memory footprint low for sparse Internet graphs.
 
 
 ---
